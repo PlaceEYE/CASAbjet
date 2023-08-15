@@ -11,6 +11,22 @@ function App() {
     test.initialize();
     test.animate();
 
+    let plane;
+    const textureLoader = new THREE.TextureLoader();
+    textureLoader.load(process.env.PUBLIC_URL + "/assets/image.png", (texture) => {
+      const planeGeometry = new THREE.PlaneGeometry(18, 30);
+      const planeMaterial = new THREE.MeshBasicMaterial({ map: texture, transparent: true  });
+      plane = new THREE.Mesh(planeGeometry, planeMaterial);
+      plane.rotation.x = Math.PI ;
+      plane.rotation.y = Math.PI ;
+      plane.rotation.z = Math.PI;
+      plane.position.y = 5;
+      plane.position.z = 15;
+      plane.visible = false;
+      test.scene.add(plane);
+    });
+  
+
     const gltfLoader = new GLTFLoader();
     let caseModel, objeModel;
     let status = 0;
@@ -69,6 +85,7 @@ function App() {
         objeModel.rotation.y += 0;
         objeModel.rotation.z += 0;
       }
+      
       requestAnimationFrame(animate);
     };
     animate();
@@ -76,6 +93,30 @@ function App() {
 
     // Adding click event listener
     const onClick = (event) => {
+      if (status%2 == 1) {
+        // Define the distance from the camera to the plane
+        const distanceFromCamera = 50; // Change this value as needed
+
+        // Compute the direction from the camera to the zero point
+        const directionToZero = new THREE.Vector3(0, 0, 0).sub(test.camera.position).normalize();
+
+        // Compute the position for the plane by extending this direction
+        const newPosition = directionToZero.multiplyScalar(distanceFromCamera).add(test.camera.position);
+
+        // Update the plane's position
+        plane.position.set(newPosition.x, newPosition.y, newPosition.z);
+
+        // Make the plane look at the camera
+        plane.lookAt(test.camera.position);
+
+        // Make the plane visible
+        plane.visible = true;
+        status++;
+      }
+      else {
+        plane.visible = false;
+        status++;
+      }
       if (status == 0 && bcaseMixer && bcaseClip && !bcaseAnimationStarted) {
         caseModel.visible = false
         bcaseModel.visible = true
@@ -87,9 +128,7 @@ function App() {
         bcaseAnimationStarted = true;
         status++;
       }
-      if (status == 1) {
-        console.log("hi")
-      }
+      
     };
 
     document.addEventListener('click', onClick);
