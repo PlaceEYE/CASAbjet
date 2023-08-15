@@ -113,7 +113,7 @@ function App() {
         plane.visible = true;
         status++;
       }
-      else {
+      else if(status > 1){
         plane.visible = false;
         status++;
       }
