@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/CASAbjet/static/css/main.e6c13ad2.css",
+    "main.js": "/CASAbjet/static/js/main.3dc23c35.js",
+    "static/js/787.4bd30faf.chunk.js": "/CASAbjet/static/js/787.4bd30faf.chunk.js",
+    "index.html": "/CASAbjet/index.html",
+    "main.e6c13ad2.css.map": "/CASAbjet/static/css/main.e6c13ad2.css.map",
+    "main.3dc23c35.js.map": "/CASAbjet/static/js/main.3dc23c35.js.map",
+    "787.4bd30faf.chunk.js.map": "/CASAbjet/static/js/787.4bd30faf.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.3dc23c35.js"
+  ]
+}
