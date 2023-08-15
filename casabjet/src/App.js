@@ -10,7 +10,7 @@ function App() {
     test.animate();
 
     const gltfLoader = new GLTFLoader();
-    let objeModel;
+    let caseModel, objeModel;
 
     gltfLoader.load(process.env.PUBLIC_URL + "/assets/camera.gltf", (gltfScene) => {
       objeModel = gltfScene.scene;
@@ -23,16 +23,29 @@ function App() {
       test.scene.add(objeModel);
     });
 
-    let bcaseModel, bcaseMixer;
+    let bcaseModel, bcaseMixer, bcaseClip;
+    let bcaseAnimationStarted = false;
+
+    gltfLoader.load(process.env.PUBLIC_URL + "/assets/bcase.gltf", (gltfScene) => {
+      caseModel = gltfScene.scene;
+      caseModel.rotation.y = 0; // You can adjust the position, rotation, and scale as needed
+      caseModel.position.y = 0;
+      caseModel.scale.set(10, 10, 10);
+      caseModel.visible = true;
+      test.scene.add(caseModel);
+
+
+    });
 
     gltfLoader.load(process.env.PUBLIC_URL + "/assets/bcase.gltf", (gltfScene) => {
       bcaseModel = gltfScene.scene;
       bcaseModel.rotation.y = 0; // You can adjust the position, rotation, and scale as needed
       bcaseModel.position.y = 0;
       bcaseModel.scale.set(10, 10, 10);
-      bcaseModel.visible = true;
+      bcaseModel.visible = false;
       test.scene.add(bcaseModel);
 
+      bcaseClip = gltfScene.animations[0];
       // Add the animations
       bcaseMixer = new THREE.AnimationMixer(bcaseModel);
       gltfScene.animations.forEach((clip) => {
@@ -44,6 +57,9 @@ function App() {
       const delta = test.clock.getDelta(); // Get the time delta
       if (bcaseMixer) {
         bcaseMixer.update(delta); // Update the animation mixer with the time delta
+        if (bcaseAnimationStarted && bcaseMixer.time >= bcaseClip.duration) {
+          bcaseModel.visible = false; // Make bcase invisible after the animation plays
+        }
       }
       if (objeModel) {
         objeModel.rotation.x += 0;
@@ -57,7 +73,15 @@ function App() {
 
     // Adding click event listener
     const onClick = (event) => {
-
+      if (bcaseMixer && bcaseClip && !bcaseAnimationStarted) {
+        caseModel.visible = false
+        bcaseModel.visible = true
+        const action = bcaseMixer.clipAction(bcaseClip);
+        action.setLoop(THREE.LoopOnce); // Play the animation once
+        action.reset(); // Reset the action to the start
+        action.play(); // Play the action
+        bcaseAnimationStarted = true;
+      }
     };
 
     document.addEventListener('click', onClick);
