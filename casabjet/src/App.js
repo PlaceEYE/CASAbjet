@@ -12,7 +12,7 @@ function App() {
     const gltfLoader = new GLTFLoader();
     let objeModel;
 
-    gltfLoader.load(process.env.PUBLIC_URL + "/assets/obje.gltf", (gltfScene) => {
+    gltfLoader.load(process.env.PUBLIC_URL + "/assets/camera.gltf", (gltfScene) => {
       objeModel = gltfScene.scene;
       objeModel.rotation.y = 0;
       objeModel.position.y = -4;
@@ -41,6 +41,10 @@ function App() {
     });
 
     const animate = () => {
+      const delta = test.clock.getDelta(); // Get the time delta
+      if (bcaseMixer) {
+        bcaseMixer.update(delta); // Update the animation mixer with the time delta
+      }
       if (objeModel) {
         objeModel.rotation.x += 0;
         objeModel.rotation.y += 0;
