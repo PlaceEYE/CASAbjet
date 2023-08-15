@@ -6,11 +6,14 @@ import SceneInit from './lib/SceneInit.js';
 function App() {
   useEffect(() => {
     const test = new SceneInit('myThreeJsCanvas');
+    const glassSound = new Audio(process.env.PUBLIC_URL + "/assets/glass.mp3");
+
     test.initialize();
     test.animate();
 
     const gltfLoader = new GLTFLoader();
     let caseModel, objeModel;
+    let status = 0;
 
     gltfLoader.load(process.env.PUBLIC_URL + "/assets/camera.gltf", (gltfScene) => {
       objeModel = gltfScene.scene;
@@ -73,14 +76,19 @@ function App() {
 
     // Adding click event listener
     const onClick = (event) => {
-      if (bcaseMixer && bcaseClip && !bcaseAnimationStarted) {
+      if (status == 0 && bcaseMixer && bcaseClip && !bcaseAnimationStarted) {
         caseModel.visible = false
         bcaseModel.visible = true
+        glassSound.play();
         const action = bcaseMixer.clipAction(bcaseClip);
         action.setLoop(THREE.LoopOnce); // Play the animation once
         action.reset(); // Reset the action to the start
         action.play(); // Play the action
         bcaseAnimationStarted = true;
+        status++;
+      }
+      if (status == 1) {
+        console.log("hi")
       }
     };
 
