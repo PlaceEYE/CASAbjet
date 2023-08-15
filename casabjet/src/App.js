@@ -36,7 +36,7 @@ function App() {
       objeModel.rotation.y = 0;
       objeModel.position.y = -4;
       objeModel.position.x = 0;
-      objeModel.position.z = 1;
+      objeModel.position.z = -1;
       objeModel.scale.set(8, 8, 8);
       objeModel.visible = true;
       test.scene.add(objeModel);
@@ -95,20 +95,20 @@ function App() {
     const onClick = (event) => {
       if (status%2 == 1) {
         // Define the distance from the camera to the plane
-        const distanceFromCamera = 50; // Change this value as needed
+        const distanceFromZero = 10; // Change this value as needed
 
         // Compute the direction from the camera to the zero point
         const directionToZero = new THREE.Vector3(0, 0, 0).sub(test.camera.position).normalize();
-
+    
         // Compute the position for the plane by extending this direction
-        const newPosition = directionToZero.multiplyScalar(distanceFromCamera).add(test.camera.position);
-
+        const newPosition = directionToZero.multiplyScalar(-distanceFromZero);
+    
         // Update the plane's position
         plane.position.set(newPosition.x, newPosition.y, newPosition.z);
-
+    
         // Make the plane look at the camera
         plane.lookAt(test.camera.position);
-
+    
         // Make the plane visible
         plane.visible = true;
         status++;
