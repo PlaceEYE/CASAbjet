@@ -54,24 +54,21 @@ export default class SceneInit {
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
     // ambient light which is for the whole scene
-    this.ambientLight = new THREE.AmbientLight(0xffffff, 2);
+    this.ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
     this.ambientLight.castShadow = true;
-    this.scene.add(this.ambientLight);
+    //this.scene.add(this.ambientLight);
 
     // directional light - parallel sun rays
-    this.directionalLight = new THREE.DirectionalLight(0xffffff, 5);
-    // this.directionalLight.castShadow = true;
+    this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
+    this.directionalLight.castShadow = true;
     this.directionalLight.position.set(0, 32, 64);
     this.scene.add(this.directionalLight);
 
-    this.pointLight = new THREE.PointLight(0xffffff, 1);
+    this.pointLight = new THREE.PointLight(0xffffff, );
     // this.directionalLight.castShadow = true;
-    this.pointLight.position.set(0, 0, 0);
+    this.pointLight.position.set(32, 32, 64);
     this.scene.add(this.pointLight);
 
-    const pointLight = new THREE.PointLight(0xffffff, 1);
-    pointLight.position.set(0, -10, -10); // position the point light
-    this.scene.add(pointLight);
     
     // if window resizes
     window.addEventListener('resize', () => this.onWindowResize(), false);

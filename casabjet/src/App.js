@@ -8,6 +8,7 @@ function App() {
     const test = new SceneInit('myThreeJsCanvas');
     const glassSound = new Audio(process.env.PUBLIC_URL + "/assets/glass.mp3");
     
+
     test.initialize();
     test.animate();
 
@@ -45,7 +46,7 @@ function App() {
     let caseModel, objeModel;
     let status = 0;
 
-    gltfLoader.load(process.env.PUBLIC_URL + "/assets/camera.gltf", (gltfScene) => {
+    gltfLoader.load(process.env.PUBLIC_URL + "/assets/fin_re.glb", (gltfScene) => {
       objeModel = gltfScene.scene;
       objeModel.rotation.y = 0;
       objeModel.position.y = -4;
