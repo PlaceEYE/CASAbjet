@@ -7,13 +7,13 @@ function App() {
   useEffect(() => {
     const test = new SceneInit('myThreeJsCanvas');
     const glassSound = new Audio(process.env.PUBLIC_URL + "/assets/glass.mp3");
-
+    
     test.initialize();
     test.animate();
 
     let plane;
     const textureLoader = new THREE.TextureLoader();
-    textureLoader.load(process.env.PUBLIC_URL + "/assets/image.png", (texture) => {
+    textureLoader.load(process.env.PUBLIC_URL + "/assets/image1.png", (texture) => {
       const planeGeometry = new THREE.PlaneGeometry(18, 30);
       const planeMaterial = new THREE.MeshBasicMaterial({ map: texture, transparent: true  });
       plane = new THREE.Mesh(planeGeometry, planeMaterial);
@@ -25,7 +25,21 @@ function App() {
       plane.visible = false;
       test.scene.add(plane);
     });
-  
+    
+    let plane2;
+    const textureLoader2 = new THREE.TextureLoader();
+    textureLoader2.load(process.env.PUBLIC_URL + "/assets/image2.png", (texture) => {
+      const planeGeometry2 = new THREE.PlaneGeometry(18, 30);
+      const planeMaterial2 = new THREE.MeshBasicMaterial({ map: texture, transparent: true  });
+      plane2 = new THREE.Mesh(planeGeometry2, planeMaterial2);
+      plane2.rotation.x = Math.PI ;
+      plane2.rotation.y = Math.PI ;
+      plane2.rotation.z = Math.PI;
+      plane2.position.y = 5;
+      plane2.position.z = 15;
+      plane2.visible = false;
+      test.scene.add(plane2);
+    });
 
     const gltfLoader = new GLTFLoader();
     let caseModel, objeModel;
@@ -93,29 +107,59 @@ function App() {
 
     // Adding click event listener
     const onClick = (event) => {
-      if (status%2 == 1) {
-        // Define the distance from the camera to the plane
-        const distanceFromZero = 10; // Change this value as needed
+      if (status == 1) {
+        if (Math.random() < 0.5)
+        {
+          // Define the distance from the camera to the plane
+          const distanceFromZero = 10; // Change this value as needed
 
-        // Compute the direction from the camera to the zero point
-        const directionToZero = new THREE.Vector3(0, 0, 0).sub(test.camera.position).normalize();
-    
-        // Compute the position for the plane by extending this direction
-        const newPosition = directionToZero.multiplyScalar(-distanceFromZero);
-    
-        // Update the plane's position
-        plane.position.set(newPosition.x, newPosition.y, newPosition.z);
-    
-        // Make the plane look at the camera
-        plane.lookAt(test.camera.position);
-    
-        // Make the plane visible
-        plane.visible = true;
-        status++;
+          // Compute the direction from the camera to the zero point
+          const directionToZero = new THREE.Vector3(0, 0, 0).sub(test.camera.position).normalize();
+      
+          // Compute the position for the plane by extending this direction
+          const newPosition = directionToZero.multiplyScalar(-distanceFromZero);
+      
+          // Update the plane's position
+          plane.position.set(newPosition.x, newPosition.y, newPosition.z);
+      
+          // Make the plane look at the camera
+          plane.lookAt(test.camera.position);
+      
+          // Make the plane visible
+          plane.visible = true;
+        }
+        else {
+           // Define the distance from the camera to the plane
+           const distanceFromZero = 10; // Change this value as needed
+
+           // Compute the direction from the camera to the zero point
+           const directionToZero = new THREE.Vector3(0, 0, 0).sub(test.camera.position).normalize();
+       
+           // Compute the position for the plane by extending this direction
+           const newPosition = directionToZero.multiplyScalar(-distanceFromZero);
+       
+           // Update the plane's position
+           plane2.position.set(newPosition.x, newPosition.y, newPosition.z);
+       
+           // Make the plane look at the camera
+           plane2.lookAt(test.camera.position);
+       
+           // Make the plane visible
+           plane2.visible = true;
+
+        }
+        
+        status = 2;
       }
-      else if(status > 1){
+      else if(status == 2){
+        if (plane2.visible == true) {
+          window.open('https://www.instagram.com/ar/699800535309791', '_blank');
+        } else if (plane.visible == true) {
+          window.open('https://www.instagram.com/ar/3558694611051303', '_blank');
+        }
         plane.visible = false;
-        status++;
+        plane2.visible = false;
+        status = 1;
       }
       if (status == 0 && bcaseMixer && bcaseClip && !bcaseAnimationStarted) {
         caseModel.visible = false
@@ -126,7 +170,7 @@ function App() {
         action.reset(); // Reset the action to the start
         action.play(); // Play the action
         bcaseAnimationStarted = true;
-        status++;
+        status = 1;
       }
       
     };
