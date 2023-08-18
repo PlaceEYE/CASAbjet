@@ -12,6 +12,21 @@ function App() {
     test.initialize();
     test.animate();
 
+    let sphere;
+    const sphereTextureLoader = new THREE.TextureLoader();
+    sphereTextureLoader.load(process.env.PUBLIC_URL + "/assets/background.jpg", (texture) => {
+      const sphereGeometry = new THREE.SphereGeometry(50, 50, 50);
+      sphereGeometry.scale(-1, 1, 1)
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.repeat.x = -1;
+      const sphereMaterial = new THREE.MeshBasicMaterial({ map: texture });
+      sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+      sphere.position.y = 3; // Adjust the position as needed
+      
+      test.scene.add(sphere);
+    });
+
+
     let plane;
     const textureLoader = new THREE.TextureLoader();
     textureLoader.load(process.env.PUBLIC_URL + "/assets/image1.png", (texture) => {
