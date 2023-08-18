@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/CASAbjet/static/css/main.e6c13ad2.css",
-    "main.js": "/CASAbjet/static/js/main.e163f8b3.js",
+    "main.js": "/CASAbjet/static/js/main.e6dfd765.js",
     "static/js/787.4bd30faf.chunk.js": "/CASAbjet/static/js/787.4bd30faf.chunk.js",
     "index.html": "/CASAbjet/index.html",
     "main.e6c13ad2.css.map": "/CASAbjet/static/css/main.e6c13ad2.css.map",
-    "main.e163f8b3.js.map": "/CASAbjet/static/js/main.e163f8b3.js.map",
+    "main.e6dfd765.js.map": "/CASAbjet/static/js/main.e6dfd765.js.map",
     "787.4bd30faf.chunk.js.map": "/CASAbjet/static/js/787.4bd30faf.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.e163f8b3.js"
+    "static/js/main.e6dfd765.js"
   ]
 }
