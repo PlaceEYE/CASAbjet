@@ -5,13 +5,49 @@ import SceneInit from './lib/SceneInit.js';
 
 function App() {
   useEffect(() => {
-    const test = new SceneInit('myThreeJsCanvas');
+    const casa = new SceneInit('myThreeJsCanvas');
     const glassSound = new Audio(process.env.PUBLIC_URL + "/assets/glass.mp3");
     
 
-    test.initialize();
-    test.animate();
-    let sphere;
+    casa.initialize();
+    casa.animate();
+
+    const createPlane = (imagePath, callback) => {
+      const textureLoader = new THREE.TextureLoader();
+      textureLoader.load(process.env.PUBLIC_URL + imagePath, (texture) => {
+        const planeGeometry = new THREE.PlaneGeometry(18, 30);
+        const planeMaterial = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.rotation.x = plane.rotation.y = plane.rotation.z = Math.PI;
+        plane.position.y = 5;
+        plane.position.z = 15;
+        plane.visible = false;
+        casa.scene.add(plane);
+        callback(plane);
+      });
+    };
+
+    const updatePlanePosition = (plane) => {
+      if (!plane || !plane.visible) return;
+
+      // Define the distance from the camera to the plane
+      const distanceFromZero = 10;
+
+      // Compute the direction from the camera to the zero point
+      const directionToZero = new THREE.Vector3(0, 0, 0).sub(casa.camera.position).normalize();
+
+      // Compute the position for the plane by extending this direction
+      const newPosition = directionToZero.multiplyScalar(-distanceFromZero);
+
+      // Update the plane's position
+      plane.position.set(newPosition.x, newPosition.y, newPosition.z);
+
+      // Make the plane look at the camera
+      plane.lookAt(casa.camera.position);
+    }
+
+    let sphere, plane, plane2;
+    // Reusable code for sphere
     const sphereTextureLoader = new THREE.TextureLoader();
     sphereTextureLoader.load(process.env.PUBLIC_URL + "/assets/background.jpg", (texture) => {
       const sphereGeometry = new THREE.SphereGeometry(50, 50, 50);
@@ -22,39 +58,11 @@ function App() {
       sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
       sphere.position.y = 3; // Adjust the position as needed
 
-      test.scene.add(sphere);
+      casa.scene.add(sphere);
     });
 
-
-    let plane;
-    const textureLoader = new THREE.TextureLoader();
-    textureLoader.load(process.env.PUBLIC_URL + "/assets/image1.png", (texture) => {
-      const planeGeometry = new THREE.PlaneGeometry(18, 30);
-      const planeMaterial = new THREE.MeshBasicMaterial({ map: texture, transparent: true  });
-      plane = new THREE.Mesh(planeGeometry, planeMaterial);
-      plane.rotation.x = Math.PI ;
-      plane.rotation.y = Math.PI ;
-      plane.rotation.z = Math.PI;
-      plane.position.y = 5;
-      plane.position.z = 15;
-      plane.visible = false;
-      test.scene.add(plane);
-    });
-    
-    let plane2;
-    const textureLoader2 = new THREE.TextureLoader();
-    textureLoader2.load(process.env.PUBLIC_URL + "/assets/image2.png", (texture) => {
-      const planeGeometry2 = new THREE.PlaneGeometry(18, 30);
-      const planeMaterial2 = new THREE.MeshBasicMaterial({ map: texture, transparent: true  });
-      plane2 = new THREE.Mesh(planeGeometry2, planeMaterial2);
-      plane2.rotation.x = Math.PI ;
-      plane2.rotation.y = Math.PI ;
-      plane2.rotation.z = Math.PI;
-      plane2.position.y = 5;
-      plane2.position.z = 15;
-      plane2.visible = false;
-      test.scene.add(plane2);
-    });
+    createPlane("/assets/image1.png", (p) => plane = p);
+    createPlane("/assets/image2.png", (p) => plane2 = p);
 
     const gltfLoader = new GLTFLoader();
     let caseModel, objeModel;
@@ -68,7 +76,7 @@ function App() {
       objeModel.position.z = -1;
       objeModel.scale.set(8, 8, 8);
       objeModel.visible = true;
-      test.scene.add(objeModel);
+      casa.scene.add(objeModel);
     });
 
     let bcaseModel, bcaseMixer, bcaseClip;
@@ -80,7 +88,7 @@ function App() {
       caseModel.position.y = 0;
       caseModel.scale.set(10, 10, 10);
       caseModel.visible = true;
-      test.scene.add(caseModel);
+      casa.scene.add(caseModel);
 
 
     });
@@ -91,7 +99,7 @@ function App() {
       bcaseModel.position.y = 0;
       bcaseModel.scale.set(10, 10, 10);
       bcaseModel.visible = false;
-      test.scene.add(bcaseModel);
+      casa.scene.add(bcaseModel);
 
       bcaseClip = gltfScene.animations[0];
       // Add the animations
@@ -102,7 +110,7 @@ function App() {
     });
 
     const animate = () => {
-      const delta = test.clock.getDelta(); // Get the time delta
+      const delta = casa.clock.getDelta(); // Get the time delta
       if (bcaseMixer) {
         bcaseMixer.update(delta); // Update the animation mixer with the time delta
         if (bcaseAnimationStarted && bcaseMixer.time >= bcaseClip.duration) {
@@ -114,45 +122,13 @@ function App() {
         objeModel.rotation.y += 0;
         objeModel.rotation.z += 0;
       }
-      if(plane && plane.visible)
-      {
-        // Define the distance from the camera to the plane
-        const distanceFromZero = 10; // Change this value as needed
-
-        // Compute the direction from the camera to the zero point
-        const directionToZero = new THREE.Vector3(0, 0, 0).sub(test.camera.position).normalize();
-    
-        // Compute the position for the plane by extending this direction
-        const newPosition = directionToZero.multiplyScalar(-distanceFromZero);
-    
-        // Update the plane's position
-        plane.position.set(newPosition.x, newPosition.y, newPosition.z);
-    
-        // Make the plane look at the camera
-        plane.lookAt(test.camera.position);
-      }
-      if(plane2 && plane2.visible)
-      {
-        // Define the distance from the camera to the plane
-        const distanceFromZero = 10; // Change this value as needed
-
-        // Compute the direction from the camera to the zero point
-        const directionToZero = new THREE.Vector3(0, 0, 0).sub(test.camera.position).normalize();
-    
-        // Compute the position for the plane by extending this direction
-        const newPosition = directionToZero.multiplyScalar(-distanceFromZero);
-    
-        // Update the plane's position
-        plane2.position.set(newPosition.x, newPosition.y, newPosition.z);
-    
-        // Make the plane look at the camera
-        plane2.lookAt(test.camera.position);
-      }
+      
+      updatePlanePosition(plane);
+      updatePlanePosition(plane2);
       
       requestAnimationFrame(animate);
     };
     animate();
-
 
     // Adding click event listener
     const onClick = (event) => {
@@ -163,7 +139,7 @@ function App() {
           const distanceFromZero = 10; // Change this value as needed
 
           // Compute the direction from the camera to the zero point
-          const directionToZero = new THREE.Vector3(0, 0, 0).sub(test.camera.position).normalize();
+          const directionToZero = new THREE.Vector3(0, 0, 0).sub(casa.camera.position).normalize();
       
           // Compute the position for the plane by extending this direction
           const newPosition = directionToZero.multiplyScalar(-distanceFromZero);
@@ -172,7 +148,7 @@ function App() {
           plane.position.set(newPosition.x, newPosition.y, newPosition.z);
       
           // Make the plane look at the camera
-          plane.lookAt(test.camera.position);
+          plane.lookAt(casa.camera.position);
       
           // Make the plane visible
           plane.visible = true;
@@ -182,7 +158,7 @@ function App() {
            const distanceFromZero = 10; // Change this value as needed
 
            // Compute the direction from the camera to the zero point
-           const directionToZero = new THREE.Vector3(0, 0, 0).sub(test.camera.position).normalize();
+           const directionToZero = new THREE.Vector3(0, 0, 0).sub(casa.camera.position).normalize();
        
            // Compute the position for the plane by extending this direction
            const newPosition = directionToZero.multiplyScalar(-distanceFromZero);
@@ -191,7 +167,7 @@ function App() {
            plane2.position.set(newPosition.x, newPosition.y, newPosition.z);
        
            // Make the plane look at the camera
-           plane2.lookAt(test.camera.position);
+           plane2.lookAt(casa.camera.position);
        
            // Make the plane visible
            plane2.visible = true;
