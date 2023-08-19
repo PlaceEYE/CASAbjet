@@ -28,7 +28,7 @@ Welcome to **[CASA: Clear Away, See All](https://placeeye.github.io/CASAbjet/)**
 
 2. **Navigate to the Project Directory:**
    ```bash
-   cd casa
+   cd CASAbjet/casabjet
    ```
 
 3. **Install Dependencies:**
