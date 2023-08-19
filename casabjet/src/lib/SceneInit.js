@@ -1,107 +1,99 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import Stats from 'three/examples/jsm/libs/stats.module';
 
 export default class SceneInit {
+  /**
+   * Constructs a new SceneInit object, initializing the Three.js scene, camera,
+   * renderer, lights, and other related properties.
+   * @param {string} canvasId - The ID of the canvas element to render the scene.
+   */
   constructor(canvasId) {
-    // NOTE: Core components to initialize Three.js app.
     this.scene = undefined;
     this.camera = undefined;
     this.renderer = undefined;
 
-    // NOTE: Camera params;
     this.fov = 45;
     this.nearPlane = 1;
     this.farPlane = 1000;
     this.canvasId = canvasId;
 
-    // NOTE: Additional components.
     this.clock = undefined;
-    this.stats = undefined;
     this.controls = undefined;
 
-    // NOTE: Lighting is basically required.
     this.ambientLight = undefined;
     this.directionalLight = undefined;
     this.pointLight = undefined;
   }
   
-
+  /**
+   * Initializes the Three.js scene, including the camera, renderer, controls,
+   * lights, and other related elements. Sets up the rendering environment with
+   * proper sizing and attaches it to the DOM.
+   */
   initialize() {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
       this.fov,
       window.innerWidth / window.innerHeight,
-      1,
-      1000
+      this.nearPlane,
+      this.farPlane
     );
-    
     this.camera.position.z = 70;
 
-
-    // NOTE: Specify a canvas which is already created in the HTML.
     const canvas = document.getElementById(this.canvasId);
     this.renderer = new THREE.WebGLRenderer({
       canvas,
-      // NOTE: Anti-aliasing smooths out the edges.
       antialias: true,
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    // this.renderer.shadowMap.enabled = true;
     document.body.appendChild(this.renderer.domElement);
 
     this.clock = new THREE.Clock();
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
-    // ambient light which is for the whole scene
+    this.setupLights();
+    window.addEventListener('resize', () => this.onWindowResize(), false);
+  }
+
+  /**
+   * Sets up the lighting for the scene, including ambient, directional, and point lights.
+   */
+  setupLights() {
     this.ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
     this.ambientLight.castShadow = true;
     this.scene.add(this.ambientLight);
 
-    // directional light - parallel sun rays
     this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-    // this.directionalLight.castShadow = true;
     this.directionalLight.position.set(0, 32, 64);
     this.scene.add(this.directionalLight);
 
     this.pointLight = new THREE.PointLight(0xffffff, 1);
-    // this.directionalLight.castShadow = true;
     this.pointLight.position.set(0, 0, 0);
     this.scene.add(this.pointLight);
-
-    const pointLight = new THREE.PointLight(0xffffff, 1);
-    pointLight.position.set(0, 40, 40); // position the point light
-    this.scene.add(pointLight);
-    
-    // if window resizes
-    window.addEventListener('resize', () => this.onWindowResize(), false);
-
-    // NOTE: Load space background.
-    // this.loader = new THREE.TextureLoader();
-    // this.scene.background = this.loader.load('./pics/space.jpeg');
-
-    // NOTE: Declare uniforms to pass into glsl shaders.
-    // this.uniforms = {
-    //   u_time: { type: 'f', value: 1.0 },
-    //   colorB: { type: 'vec3', value: new THREE.Color(0xfff000) },
-    //   colorA: { type: 'vec3', value: new THREE.Color(0xffffff) },
-    // };
   }
 
+  /**
+   * Begins the animation loop, calling the render method on each animation frame
+   * and updating the controls. Intended to be called once to start the animation.
+   */
   animate() {
-    // NOTE: Window is implied.
-    // requestAnimationFrame(this.animate.bind(this));
     window.requestAnimationFrame(this.animate.bind(this));
     this.render();
     this.controls.update();
   }
 
+  /**
+   * Renders the current state of the scene, drawing it to the canvas as specified
+   * in the initialization. Updates any dynamic properties as needed for each frame.
+   */
   render() {
-    // NOTE: Update uniform data on each render.
-    // this.uniforms.u_time.value += this.clock.getDelta();
     this.renderer.render(this.scene, this.camera);
   }
 
+  /**
+   * Handles the window resize event, updating the camera aspect ratio and renderer
+   * size to match the new window dimensions, ensuring the scene scales properly.
+   */
   onWindowResize() {
     this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();

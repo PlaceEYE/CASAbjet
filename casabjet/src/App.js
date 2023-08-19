@@ -3,15 +3,26 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import SceneInit from './lib/SceneInit.js';
 
+/**
+ * React component responsible for rendering and controlling a Three.js scene.
+ * It initializes the 3D environment, loads assets (textures, models, and sounds),
+ * defines animation logic, and handles user interactions through click events.
+ * The scene includes objects such as planes, spheres, and GLTF models, with animations and interactions.
+ */
 function App() {
   useEffect(() => {
     const casa = new SceneInit('myThreeJsCanvas');
     const glassSound = new Audio(process.env.PUBLIC_URL + "/assets/glass.mp3");
+    let status = 0;
     
-
     casa.initialize();
     casa.animate();
 
+  /**
+   * Creates a plane using the given image path and attaches it to the scene.
+   * @param {string} imagePath - The relative path to the image to be used as texture.
+   * @param {function} callback - Callback function to be executed with the plane as argument.
+   */
     const createPlane = (imagePath, callback) => {
       const textureLoader = new THREE.TextureLoader();
       textureLoader.load(process.env.PUBLIC_URL + imagePath, (texture) => {
@@ -27,27 +38,21 @@ function App() {
       });
     };
 
+  /**
+   * Updates the position of a given plane based on the camera position.
+   * The plane is made to look at the camera and positioned at a defined distance from the origin.
+   * @param {THREE.Mesh} plane - The plane to update. If the plane is not defined or not visible, the function returns early.
+   */
     const updatePlanePosition = (plane) => {
       if (!plane || !plane.visible) return;
-
-      // Define the distance from the camera to the plane
       const distanceFromZero = 10;
-
-      // Compute the direction from the camera to the zero point
       const directionToZero = new THREE.Vector3(0, 0, 0).sub(casa.camera.position).normalize();
-
-      // Compute the position for the plane by extending this direction
       const newPosition = directionToZero.multiplyScalar(-distanceFromZero);
-
-      // Update the plane's position
       plane.position.set(newPosition.x, newPosition.y, newPosition.z);
-
-      // Make the plane look at the camera
       plane.lookAt(casa.camera.position);
     }
 
     let sphere, plane, plane2;
-    // Reusable code for sphere
     const sphereTextureLoader = new THREE.TextureLoader();
     sphereTextureLoader.load(process.env.PUBLIC_URL + "/assets/background.jpg", (texture) => {
       const sphereGeometry = new THREE.SphereGeometry(50, 50, 50);
@@ -56,8 +61,7 @@ function App() {
       texture.repeat.x = -1;
       const sphereMaterial = new THREE.MeshBasicMaterial({ map: texture });
       sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-      sphere.position.y = 3; // Adjust the position as needed
-
+      sphere.position.y = 3;
       casa.scene.add(sphere);
     });
 
@@ -66,7 +70,8 @@ function App() {
 
     const gltfLoader = new GLTFLoader();
     let caseModel, objeModel;
-    let status = 0;
+    let bcaseModel, bcaseMixer, bcaseClip;
+    let bcaseAnimationStarted = false;
 
     gltfLoader.load(process.env.PUBLIC_URL + "/assets/fin_re.glb", (gltfScene) => {
       objeModel = gltfScene.scene;
@@ -78,43 +83,39 @@ function App() {
       objeModel.visible = true;
       casa.scene.add(objeModel);
     });
-
-    let bcaseModel, bcaseMixer, bcaseClip;
-    let bcaseAnimationStarted = false;
-
     gltfLoader.load(process.env.PUBLIC_URL + "/assets/bcase.gltf", (gltfScene) => {
       caseModel = gltfScene.scene;
-      caseModel.rotation.y = 0; // You can adjust the position, rotation, and scale as needed
+      caseModel.rotation.y = 0;
       caseModel.position.y = 0;
       caseModel.scale.set(10, 10, 10);
       caseModel.visible = true;
       casa.scene.add(caseModel);
-
-
     });
-
     gltfLoader.load(process.env.PUBLIC_URL + "/assets/bcase.gltf", (gltfScene) => {
       bcaseModel = gltfScene.scene;
-      bcaseModel.rotation.y = 0; // You can adjust the position, rotation, and scale as needed
+      bcaseModel.rotation.y = 0; 
       bcaseModel.position.y = 0;
       bcaseModel.scale.set(10, 10, 10);
       bcaseModel.visible = false;
       casa.scene.add(bcaseModel);
-
       bcaseClip = gltfScene.animations[0];
-      // Add the animations
       bcaseMixer = new THREE.AnimationMixer(bcaseModel);
       gltfScene.animations.forEach((clip) => {
         bcaseMixer.clipAction(clip).play();
       });
     });
 
+  /**
+   * Main animation loop function. Responsible for updating the animation for various objects
+   * and requesting the next animation frame. Updates the position of planes, rotates objects,
+   * and manages animations using Three.js animation mixer.
+   */
     const animate = () => {
       const delta = casa.clock.getDelta(); // Get the time delta
       if (bcaseMixer) {
-        bcaseMixer.update(delta); // Update the animation mixer with the time delta
+        bcaseMixer.update(delta); 
         if (bcaseAnimationStarted && bcaseMixer.time >= bcaseClip.duration) {
-          bcaseModel.visible = false; // Make bcase invisible after the animation plays
+          bcaseModel.visible = false; 
         }
       }
       if (objeModel) {
@@ -122,58 +123,36 @@ function App() {
         objeModel.rotation.y += 0;
         objeModel.rotation.z += 0;
       }
-      
       updatePlanePosition(plane);
       updatePlanePosition(plane2);
-      
       requestAnimationFrame(animate);
     };
     animate();
 
-    // Adding click event listener
+  /**
+   * Event handler for mouse click events. Manages the interaction logic for different stages of the scene,
+   * including triggering animations, making planes visible or invisible, playing sounds, and opening URLs.
+   * @param {Event} event - The click event.
+   */
     const onClick = (event) => {
       if (status == 1) {
         if (Math.random() < 0.5)
         {
-          // Define the distance from the camera to the plane
-          const distanceFromZero = 10; // Change this value as needed
-
-          // Compute the direction from the camera to the zero point
+          const distanceFromZero = 10;
           const directionToZero = new THREE.Vector3(0, 0, 0).sub(casa.camera.position).normalize();
-      
-          // Compute the position for the plane by extending this direction
           const newPosition = directionToZero.multiplyScalar(-distanceFromZero);
-      
-          // Update the plane's position
           plane.position.set(newPosition.x, newPosition.y, newPosition.z);
-      
-          // Make the plane look at the camera
           plane.lookAt(casa.camera.position);
-      
-          // Make the plane visible
           plane.visible = true;
         }
         else {
-           // Define the distance from the camera to the plane
-           const distanceFromZero = 10; // Change this value as needed
-
-           // Compute the direction from the camera to the zero point
+           const distanceFromZero = 10; 
            const directionToZero = new THREE.Vector3(0, 0, 0).sub(casa.camera.position).normalize();
-       
-           // Compute the position for the plane by extending this direction
            const newPosition = directionToZero.multiplyScalar(-distanceFromZero);
-       
-           // Update the plane's position
            plane2.position.set(newPosition.x, newPosition.y, newPosition.z);
-       
-           // Make the plane look at the camera
            plane2.lookAt(casa.camera.position);
-       
-           // Make the plane visible
            plane2.visible = true;
-
         }
-        
         status = 2;
       }
       else if(status == 2){
@@ -191,19 +170,15 @@ function App() {
         bcaseModel.visible = true
         glassSound.play();
         const action = bcaseMixer.clipAction(bcaseClip);
-        action.setLoop(THREE.LoopOnce); // Play the animation once
-        action.reset(); // Reset the action to the start
-        action.play(); // Play the action
+        action.setLoop(THREE.LoopOnce); 
+        action.reset();
+        action.play();
         bcaseAnimationStarted = true;
         status = 1;
       }
-      
     };
-
     document.addEventListener('click', onClick);
-  
     return () => {
-      // Clean up the event listener when the component is unmounted
       document.removeEventListener('click', onClick);
     };
   }, []);
