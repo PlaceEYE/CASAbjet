@@ -11,7 +11,6 @@ function App() {
 
     test.initialize();
     test.animate();
-    
     let sphere;
     const sphereTextureLoader = new THREE.TextureLoader();
     sphereTextureLoader.load(process.env.PUBLIC_URL + "/assets/background.jpg", (texture) => {
@@ -114,6 +113,40 @@ function App() {
         objeModel.rotation.x += 0;
         objeModel.rotation.y += 0;
         objeModel.rotation.z += 0;
+      }
+      if(plane && plane.visible)
+      {
+        // Define the distance from the camera to the plane
+        const distanceFromZero = 10; // Change this value as needed
+
+        // Compute the direction from the camera to the zero point
+        const directionToZero = new THREE.Vector3(0, 0, 0).sub(test.camera.position).normalize();
+    
+        // Compute the position for the plane by extending this direction
+        const newPosition = directionToZero.multiplyScalar(-distanceFromZero);
+    
+        // Update the plane's position
+        plane.position.set(newPosition.x, newPosition.y, newPosition.z);
+    
+        // Make the plane look at the camera
+        plane.lookAt(test.camera.position);
+      }
+      if(plane2 && plane2.visible)
+      {
+        // Define the distance from the camera to the plane
+        const distanceFromZero = 10; // Change this value as needed
+
+        // Compute the direction from the camera to the zero point
+        const directionToZero = new THREE.Vector3(0, 0, 0).sub(test.camera.position).normalize();
+    
+        // Compute the position for the plane by extending this direction
+        const newPosition = directionToZero.multiplyScalar(-distanceFromZero);
+    
+        // Update the plane's position
+        plane2.position.set(newPosition.x, newPosition.y, newPosition.z);
+    
+        // Make the plane look at the camera
+        plane2.lookAt(test.camera.position);
       }
       
       requestAnimationFrame(animate);
